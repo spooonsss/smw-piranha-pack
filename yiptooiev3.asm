@@ -15,8 +15,6 @@
 ; This sprite requires manual GFX insertion. Please refer to the README for more info
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-		!GFXADDR = $358000		; change this to where you inserted your GFX
-
 ;; Variables:
 		!SPRITE_NUM = $82		; custom sprite of needlenose bomb
 		!SHOOTSND = $3A			; sound after needlenose fired  (in $1DFC)
@@ -971,9 +969,9 @@ KO_LOOP:		CPY #$00		; \ zero? if so,
 		LDA !14C8,y		; \  speed doesn't matter
 		CMP #$0B		;  | if Mario is holding
 		BEQ GETHIT		; /  the shell (status=B)
-		LDA !AA|!dp,y		; \ continue if sprite
+		LDA !AA,y		; \ continue if sprite
 		BNE GETHIT		; / has Y speed
-		LDA !B6|!dp,y		; \ continue if sprite
+		LDA !B6,y		; \ continue if sprite
 		BNE GETHIT		; / has X speed
 		BRA KO_LOOP		; no speed / not holding -> don't kill
 GETHIT:		LDA #$04		; \ give mario

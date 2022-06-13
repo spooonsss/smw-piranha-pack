@@ -634,7 +634,7 @@ END_INTERACT:	RTS
 LOSEYOSHI:	PHX
 		LDX $18E2|!addr
 		LDA #$10
-		STA !163E-1|!addr,x
+		STA !163E-1,x
 		LDA #$03
 		STA $1DFA|!addr
 		LDA #$13
@@ -652,8 +652,8 @@ LOSEYOSHI:	PHX
 		LDA $02A4B3|!bank,x
 		PLX
 		STA !B6-1,x
-		STZ !1594-1|!addr,x
-		STZ !151C-1|!addr,x
+		STZ !1594-1,x
+		STZ !151C-1,x
 		STZ $18AE|!addr
 		LDA #$30
 		STA $1497|!addr
