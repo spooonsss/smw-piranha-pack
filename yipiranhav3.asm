@@ -194,20 +194,20 @@ SPRITE_ROUTINE:	LDA !EXTRA_BITS,x	; \
 		LDA !EXTRA_BIT		; get extra bit
 		PHA			; push extra bit, some INTERACTION routines use the same scratch RAM address
 		BNE NOFALL		; skip "physics" if it's set
-		JSL !PHYSICS		; update position based on speed values
-		JSL !SPRSPRINTERACT	; interact with other sprites
+		JSL !PHYSICS|!bank		; update position based on speed values
+		JSL !SPRSPRINTERACT|!bank	; interact with other sprites
 NOFALL:		LDA !ACTSTATUS,x		; get currrent status
 		CMP #$02		; \ if dying, then
 		BCS NOINTERACT		; / skip INTERACTION
 		LDA !GFXMODE,x		; \ if SMALL then skip
 		BEQ SKIPHEADINTER	; / head INTERACTION
 		JSR HEADINTERACT	; head interactions
-SKIPHEADINTER:	JSL !MARIOSPRINTERACT	; check for mario/sprite contact
+SKIPHEADINTER:	JSL !MARIOSPRINTERACT|!bank	; check for mario/sprite contact
 		JSR SHELLINTERACT	; knock out if hit with shell
 NOINTERACT:	PLA			; \ pull
 		STA !EXTRA_BIT		; / extra bit
 		LDA !ACTSTATUS,x		; get status
-		JSL !EXECUTEPTR		; jump to code for current status
+		JSL !EXECUTEPTR|!bank		; jump to code for current status
 
 		dw SMALL&$FFFF
 		dw BIG&$FFFF
@@ -306,7 +306,7 @@ SETHEADPALETTE:	STA !HEADPALETTE,x	; /
 		STA !14C8,x             ; / spin-jump kill
 		LDA #$1F                ; \ set spin jump
 		STA !1540,x             ; / animation timer
-		JSL !SPINJUMPSTARS	; do star animation
+		JSL !SPINJUMPSTARS|!bank	; do star animation
 RETURNSHRINK:	RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -540,12 +540,12 @@ KO_LOOP:		CPY #$00		; \ zero? if so,
 		LDA !1686,y		; \  if sprite doesn't
 		AND #%00001000		;  | interact with others
 		BNE KO_LOOP		; /  don't continue
-		JSL !GETSPRITECLIPPINGA	; \
+		JSL !GETSPRITECLIPPINGA|!bank	; \
 		PHX			;  | if sprite is
 		TYX			;  | not touching
-		JSL !GETSPRITECLIPPINGB	;  | this sprite
+		JSL !GETSPRITECLIPPINGB|!bank	;  | this sprite
 		PLX			;  | don't continue
-		JSL !CHECKFORCONTACT	;  |
+		JSL !CHECKFORCONTACT|!bank	;  |
 		BCC KO_LOOP		; /
 		LDA !14C8,y		; \  speed doesn't matter
 		CMP #$0B		;  | if Mario is holding
@@ -612,7 +612,7 @@ INTERACTION:	LDA $77			; \
 		BPL MARIO_INTERACT	; / skip Yoshi check
 YOSHI_CHECK:	LDA $187A|!addr		; \ yoshi interact
 		BNE YOSHI_INTERACT	; / if riding Yoshi
-MARIO_INTERACT:	JSL !MARIOSPRINTERACT	; normal interact with mario
+MARIO_INTERACT:	JSL !MARIOSPRINTERACT|!bank	; normal interact with mario
 		RTS
 YOSHI_INTERACT:	LDA $1490|!addr		; \ Mario INTERACTION
 		BNE MARIO_INTERACT	; / if Mario has star
@@ -622,7 +622,7 @@ YOSHI_INTERACT:	LDA $1490|!addr		; \ Mario INTERACTION
 		PHA			;  | set "no default INTERACTION"
 		ORA #%10000000		;  | flag temporarily and back-up
 		STA !167A,x		; /
-		JSL !MARIOSPRINTERACT	; detect if mario touching
+		JSL !MARIOSPRINTERACT|!bank	; detect if mario touching
 		PLA			; \ load backed up
 		STA !167A,x		; / interact flag
 		BCC END_INTERACT	; if mario is not touching, don't lose yoshi
@@ -666,7 +666,7 @@ STOPFIREBALLS:	LDY #$09		; index of first fireball
 FB_LOOP_BEGIN:	LDA $170B|!addr,y		; \
 		CMP #$05		;  | ignore if not fireball
 		BNE FB_LOOP		; /
-		JSL !GETSPRITECLIPPINGA	; \
+		JSL !GETSPRITECLIPPINGA|!bank	; \
 		LDA $171F|!addr,y		;  | ignore
 		SEC			;  | if not
 		SBC #$02		;  | touching
@@ -685,7 +685,7 @@ FB_LOOP_BEGIN:	LDA $170B|!addr,y		; \
 		STA $09			;  |
 		LDA #$13		;  |
 		STA $03			;  |
-		JSL !CHECKFORCONTACT	;  |
+		JSL !CHECKFORCONTACT|!bank	;  |
 		BCC FB_LOOP		; /
 		LDA #$0F		; \
 		STA $176F|!addr,y		;  | turn fireball
@@ -731,7 +731,7 @@ SKIPTOBASE:	JSR DRAW_BASE		; draw base
 		LDY #$02                ; #$02 means the tiles are 16x16
 		LDA !GFXTMP_TILECOUNT	; # of tiles drawn -1
 		;BMI RETURN_SUB_GFX	; return if no tiles drawn (commented out because there will never be zero tiles drawn)
-		JSL !FINISHOAMWRITE	; don't draw if offscreen, set sizes
+		JSL !FINISHOAMWRITE|!bank	; don't draw if offscreen, set sizes
 RETURN_SUB_GFX:	RTS
 
 DRAW_HEAD:	PHY			; \
