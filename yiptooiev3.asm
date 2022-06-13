@@ -1296,6 +1296,8 @@ get_dynamic_slot:
 	PHB : PLA
     ; PHB : PLA
 	LDA.b #gfx/$10000
+	CLC
+	ADC !GFXTMP_FRAMEBANK
 	STA !SlotBank	;store bank to 24bit pointer
 
 	PHX		;This is how I made your boi a routine
