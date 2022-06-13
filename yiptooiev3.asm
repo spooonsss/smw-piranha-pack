@@ -1,3 +1,5 @@
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yoshi's Island Wild Ptooie Piranha Plant (v3.0)
 ; Programmed by SMWEdit
@@ -22,17 +24,17 @@
 		!FLASHPALETTE = $0F		; palette for flashing head
 
 ;; Sprite Tables:
-		!ACTSTATUS = $C2			; 0 = TRACKING, 1 = pausing before firing, 2 = aiming/firing, 3 = pausing while mouth open, 4 = pausing while mouth just closed, 5 = hit with shell, 6 = pause after hit, 7 = shrinking
-		!OFFSET = $1504
-		!SHOTSFIRED = $1528
-		!HITCOUNT = $1534
-		!FRAME = $1570
-		!FBANK = $1602
-		!TIMER = $163E
-		!HEADPALETTE = $1626
-		!HITDATA = $151C
-		!EXTRA_BITS = $7FAB10
-		!EXTRA_PROP1 = $7FAB28
+		!ACTSTATUS = !C2			; 0 = TRACKING, 1 = pausing before firing, 2 = aiming/firing, 3 = pausing while mouth open, 4 = pausing while mouth just closed, 5 = hit with shell, 6 = pause after hit, 7 = shrinking
+		!OFFSET = !1504
+		!SHOTSFIRED = !1528
+		!HITCOUNT = !1534
+		!FRAME = !1570
+		!FBANK = !1602
+		!TIMER = !163E
+		!HEADPALETTE = !1626
+		!HITDATA = !151C
+		!EXTRA_BITS = !7FAB10
+		!EXTRA_PROP1 = !7FAB28
 
 ;; Scratch RAM:
 		!TMP1 = $00
@@ -112,11 +114,11 @@ SETINITOFFSET:	STA !OFFSET,x		; set initial rotation
 		TAY			;  | on extra
 		LDA FLIP_YPOS_LO,y	;  | bit
 		CLC			;  |
-		ADC $D8,x		;  |
-		STA $D8,x		;  |
+		ADC !D8,x		;  |
+		STA !D8,x		;  |
 		LDA FLIP_YPOS_HI,y	;  |
-		ADC $14D4,x		;  |
-		STA $14D4,x		; /
+		ADC !14D4,x		;  |
+		STA !14D4,x		; /
 		LDY #$01		; \ first
 		LDA (!HITPALADDR),y	; / color
 		ASL A			; \ convert to
@@ -125,13 +127,13 @@ SETINITOFFSET:	STA !OFFSET,x		; set initial rotation
 		PLB
 		RTL
 
-		PRINT "MAIN ",pc			
+		PRINT "MAIN ",pc
 		PHB
-		PHK			
+		PHK
 		PLB
 		JSR SPRITE_ROUTINE
 		PLB
-		RTL     
+		RTL
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -371,7 +373,7 @@ SPRITE_ROUTINE:	LDA !EXTRA_BITS,x	; \
 		LSR A			;  | easily accessible
 		STA !EXTRA_BIT		; /
 		JSR SUB_GFX		; GFX
-		LDA $14C8,x		; \  return if
+		LDA !14C8,x		; \  return if
 		CMP #$08		;  | sprite
 		BNE RETURN1		; /  status != 8
 		LDA $9D			; \ return if
@@ -426,7 +428,7 @@ NOINTERACT:	LDA !EXTRA_PROP1,x	; \
 TRACKING:	LDA $14			; \
 		AND #%00000001		;  | only ROTATE every other frame
 		BNE NOROTATE		; /
-		LDY $187A		; get riding Yoshi status
+		LDY $187A|!addr		; get riding Yoshi status
 		LDA $96			; get Mario Y low byte
 		PHA			; back up
 		CLC			; \ offset by different numbers depending
@@ -509,7 +511,7 @@ POSITIVEOFFSET:	PHA			; preserve goal offset
 		STA !FBANK,x		; /
 		JSR SHOOT		; fire projectile
 		LDA #!SHOOTSND		; \ play
-		STA $1DFC		; / SFX
+		STA $1DFC|!addr		; / SFX
 		INC !SHOTSFIRED,x	; another shot fired
 		LDA #$10		; \ set open
 		STA !TIMER,x		; / mouth timer
@@ -570,7 +572,7 @@ GETHITCONFIG:	LDA (!HITPALADDR)	; \  decide how to act
 		CMP !HITCOUNT,x		;  | depending on whether
 		BCS TIMERFLASH		; /  this is the last shot
 		LDA #$FF		; \ set sprite not to re-appear
-		STA $161A,x		; / if it goes offscreen
+		STA !161A,x		; / if it goes offscreen
 		LDY !HITCOUNT,x		; get hit-count, used for palette index
 		BRA SKIPFLASH		; skip over code to flash using the timer
 TIMERFLASH:	LDA !TIMER,x		; \
@@ -613,7 +615,7 @@ INITSHRINK:	LDA #$30		; \ set shrinking
 ;;;;;;;;;;;;;;;;
 
 SHRINK:		LDA !HITDATA,x		; \
-		AND #%10000000		;  | get 
+		AND #%10000000		;  | get
 		LSR A			;  | mouth
 		LSR A			;  | state
 		STA !TMP1		;  | offset
@@ -625,7 +627,7 @@ SHRINK:		LDA !HITDATA,x		; \
 		STA !FRAME,x		; set frame
 		LDA #$01		; \ set frame
 		STA !FBANK,x		; / bank
-		TYA			; \ 
+		TYA			; \
 		LSR A			;  | flash
 		LSR A			;  | head
 		AND #%00000001		;  | when
@@ -642,9 +644,9 @@ SETHEADPALETTE:	STA !HEADPALETTE,x	; /
 		LDA !TIMER,x		; \ if not done,
 		BNE RETURNSHRINK	; / don't move on
 		LDA #$04                ; \ set sprite to
-		STA $14C8,x             ; / spin-jump kill
+		STA !14C8,x             ; / spin-jump kill
 		LDA #$1F                ; \ set spin jump
-		STA $1540,x             ; / animation timer
+		STA !1540,x             ; / animation timer
 		JSL !SPINJUMPSTARS	; do star animation
 RETURNSHRINK:	RTS
 
@@ -733,22 +735,22 @@ CHKHORZ:		PHA
 		ADC #$3E
 ENDQUADCHK:	RTS
 
-CALCFRAME:	LDA $D8,x
+CALCFRAME:	LDA !D8,x
 		SEC
 		SBC $96
 		STA !FC_TEMP2
-		LDA $14D4,x
+		LDA !14D4,x
 		SBC $97
 		STA !FC_TEMP2+1
 		BNE HORZDIST
 		LDA !FC_TEMP2
 		BNE HORZDIST
 		BRA SETHORZ
-HORZDIST:	LDA $E4,x
+HORZDIST:	LDA !E4,x
 		SEC
 		SBC $94
 		STA !FC_TEMP1
-		LDA $14E0,x
+		LDA !14E0,x
 		SBC $95
 		STA !FC_TEMP1+1
 		BNE BEGINMATH
@@ -801,29 +803,29 @@ NOFREESLOTS:	PLA
 
 SHOOT:		LDA !EXTRA_BIT		; \ back up extra
 		PHA			; / bit scratch RAM
-		JSL $02A9DE		; \ get slot or else
+		JSL $02A9DE|!bank		; \ get slot or else
 		BMI NOFREESLOTS		; / end if no SLOTS
 		PLA			; \ load backed up extra
 		STA !EXTRA_BIT		; / bit scratch RAM
 		LDA #$01		; \ set sprite status
-		STA $14C8,y		; / as a new sprite
+		STA !14C8,y		; / as a new sprite
 		PHX			; back up X
 		TYX			; new sprite index to X
 		LDA #!SPRITE_NUM		; \ store custom
-		STA $7FAB9E,x		; / sprite number
-		JSL $07F7D2		; reset sprite properties
-		JSL $0187A7		; get table values for custom sprite
+		STA !7FAB9E,x		; / sprite number
+		JSL $07F7D2|!bank		; reset sprite properties
+		JSL $0187A7|!bank		; get table values for custom sprite
 		LDA #$08		; \ mark as a
-		STA $7FAB10,x		; / custom sprite
+		STA !7FAB10,x		; / custom sprite
 		PLX			; load backed up X
-		LDA $E4,x		; \
-		STA $00E4,y		;  | set center
-		LDA $14E0,x		;  | position for
-		STA $14E0,y		;  | needlenose
-		LDA $D8,x		;  | so that in next
-		STA $00D8,y		;  | code, it can
-		LDA $14D4,x		;  | be shifted
-		STA $14D4,y		; /
+		LDA !E4,x		; \
+		STA !E4|!dp,y		;  | set center
+		LDA !14E0,x		;  | position for
+		STA !14E0,y		;  | needlenose
+		LDA !D8,x		;  | so that in next
+		STA !D8|!dp,y		;  | code, it can
+		LDA !14D4,x		;  | be shifted
+		STA !14D4,y		; /
 		LDA !OFFSET,x		; \
 		PHX			;  | X
 		TAX			;  |
@@ -833,11 +835,11 @@ SHOOT:		LDA !EXTRA_BIT		; \ back up extra
 		BPL ADDPROJXDISP	;  |
 		DEX			;  |
 ADDPROJXDISP:	CLC			;  |
-		ADC $00E4,y		;  |
-		STA $00E4,y		;  |
+		ADC !E4|!dp,y		;  |
+		STA !E4|!dp,y		;  |
 		TXA			;  |
-		ADC $14E0,y		;  |
-		STA $14E0,y		;  |
+		ADC !14E0,y		;  |
+		STA !14E0,y		;  |
 		PLX			; /
 		LDA !OFFSET,x		; \
 		PHX			;  | Y
@@ -852,35 +854,35 @@ NOFLIPPROJY:	LDX #$00		;  |
 		BPL ADDPROJYDISP	;  |
 		DEX			;  |
 ADDPROJYDISP:	CLC			;  |
-		ADC $00D8,y		;  |
-		STA $00D8,y		;  |
+		ADC !D8|!dp,y		;  |
+		STA !D8|!dp,y		;  |
 		TXA			;  |
-		ADC $14D4,y		;  |
-		STA $14D4,y		;  |
+		ADC !14D4,y		;  |
+		STA !14D4,y		;  |
 		PLX			; /
 		LDA !OFFSET,x		; \
 		PHX			;  | speeds
 		TAX			;  |
 		LDA XSPEEDS,x		;  |
-		STA $00B6,y		;  |
+		STA !B6|!dp,y		;  |
 		LDA YSPEEDS,x		;  |
 		LDX !EXTRA_BIT		;  |
 		BEQ NOFLIPPROJYS	;  |
 		EOR #$FF		;  |
 		INC A			;  |
-NOFLIPPROJYS:	STA $00AA,y		;  |
+NOFLIPPROJYS:	STA !AA|!dp,y		;  |
 		PLX			; /
 		RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-HEADINTERACT:	LDA $E4,x		; \
+HEADINTERACT:	LDA !E4,x		; \
 		PHA			;  | back up
-		LDA $14E0,x		;  | sprite
+		LDA !14E0,x		;  | sprite
 		PHA			;  | positions
-		LDA $D8,x		;  |
+		LDA !D8,x		;  |
 		PHA			;  |
-		LDA $14D4,x		;  |
+		LDA !14D4,x		;  |
 		PHA			; /
 		LDY !OFFSET,x		; \
 		LDA XCOORDS,y		;  | X
@@ -889,11 +891,11 @@ HEADINTERACT:	LDA $E4,x		; \
 		BPL ADDXDISP		;  |
 		DEY			;  |
 ADDXDISP:	CLC			;  |
-		ADC $E4,x		;  |
-		STA $E4,x		;  |
+		ADC !E4,x		;  |
+		STA !E4,x		;  |
 		TYA			;  |
-		ADC $14E0,x		;  |
-		STA $14E0,x		; /
+		ADC !14E0,x		;  |
+		STA !14E0,x		; /
 		LDY !OFFSET,x		; \
 		LDA YCOORDS,y		;  | Y
 		LDY !EXTRA_BIT		;  |
@@ -905,29 +907,29 @@ NOTUPSIDEDOWN:	LDY #$00		;  |
 		BPL ADDYDISP		;  |
 		DEY			;  |
 ADDYDISP:	CLC			;  |
-		ADC $D8,x		;  |
-		STA $D8,x		;  |
+		ADC !D8,x		;  |
+		STA !D8,x		;  |
 		TYA			;  |
-		ADC $14D4,x		;  |
-		STA $14D4,x		; /
-		LDA $1662,x		; \
+		ADC !14D4,x		;  |
+		STA !14D4,x		; /
+		LDA !1662,x		; \
 		PHA			;  | set head clipping
 		AND #%11000000		;  | offset and backup
 		ORA #$27		;  | that sprite table
-		STA $1662,x		; /
+		STA !1662,x		; /
 		JSR INTERACTION		; Mario/Yoshi INTERACTION
 		JSR STOPFIREBALLS	; interact with fireballs
 		JSR SHELLINTERACT	; interact with shells
 		PLA			; \ load backed-up
-		STA $1662,x		; / tweaker value $1662
+		STA !1662,x		; / tweaker value $1662
 		PLA			; \
-		STA $14D4,x		;  | load backed up
+		STA !14D4,x		;  | load backed up
 		PLA			;  | sprite positions
-		STA $D8,x		;  |
+		STA !D8,x		;  |
 		PLA			;  |
-		STA $14E0,x		;  |
+		STA !14E0,x		;  |
 		PLA			;  |
-		STA $E4,x		; /
+		STA !E4,x		; /
 HEADINTERACTEND:	RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -936,10 +938,10 @@ SHELLINTERACT:	LDY #$0C		; load number of times to go through loop
 KO_LOOP:		CPY #$00		; \ zero? if so,
 		BEQ HEADINTERACTEND	; / end loop
 		DEY			; decrease # of times left+get index
-		LDA $14C8,y		; \  if sprite's status
+		LDA !14C8,y		; \  if sprite's status
 		CMP #$09		;  | is less than 9 (9,A,B = shell modes)
 		BCC KO_LOOP		; /  ignore sprite
-		LDA $1686,y		; \  if sprite doesn't
+		LDA !1686,y		; \  if sprite doesn't
 		AND #%00001000		;  | interact with others
 		BNE KO_LOOP		; /  don't continue
 		JSL !GETSPRITECLIPPINGA	; \
@@ -949,36 +951,36 @@ KO_LOOP:		CPY #$00		; \ zero? if so,
 		PLX			;  | don't continue
 		JSL !CHECKFORCONTACT	;  |
 		BCC KO_LOOP		; /
-		LDA $14C8,y		; \  speed doesn't matter
+		LDA !14C8,y		; \  speed doesn't matter
 		CMP #$0B		;  | if Mario is holding
 		BEQ GETHIT		; /  the shell (status=B)
-		LDA $00AA,y		; \ continue if sprite
+		LDA !AA|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has Y speed
-		LDA $00B6,y		; \ continue if sprite
+		LDA !B6|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has X speed
 		BRA KO_LOOP		; no speed / not holding -> don't kill
 GETHIT:		LDA #$04		; \ give mario
-		JSL $02ACE5		; / 1000 points
+		JSL $02ACE5|!bank		; / 1000 points
 		LDA #!KNOCKOUTSND	; \ play knockout
-		STA $1DFC		; / sound
-		LDA $009E,y		; \
+		STA $1DFC|!addr		; / sound
+		LDA !9E|!dp,y		; \
 		CMP #$53		;  | if throw block, don't do star animation
 		BEQ NOSTARANI		; /
 		LDA #$04                ; \ set sprite to
-		STA $14C8,y             ; / spin-jump kill
+		STA !14C8,y             ; / spin-jump kill
 		LDA #$1F                ; \ set spin jump
-		STA $1540,y             ; / animation timer
+		STA !1540,y             ; / animation timer
 		PHY			; \
-		STY $15E9		;  | do star
-		JSL $07FC3B		;  | animation
-		STX $15E9		;  |
+		STY $15E9|!addr		;  | do star
+		JSL $07FC3B|!bank		;  | animation
+		STX $15E9|!addr		;  |
 		PLY			; /
-STARTKNOCKOUT:	LDA $00B6,y		; \
+STARTKNOCKOUT:	LDA !B6|!dp,y		; \
 		BNE GETHIBIT		;  | get index
-		LDA $E4,x		;  | for direction
-		CMP $00E4,y		;  | to turn
-		LDA $14E0,x		;  | towards
-		SBC $14E0,y		;  |
+		LDA !E4,x		;  | for direction
+		CMP !E4|!dp,y		;  | to turn
+		LDA !14E0,x		;  | towards
+		SBC !14E0,y		;  |
 GETHIBIT:	ROL A			;  |
 		ROL A			;  |
 		AND #%00000001		;  |
@@ -998,16 +1000,16 @@ GETHIBIT:	ROL A			;  |
 		LDA (!HITPALADDR)	; \  disable INTERACTION
 		CMP !HITCOUNT,x		;  | if this is the last
 		BCS ENDSHELLLOOP	; /  hit before it dies
-		LDA $167A,x		; \
+		LDA !167A,x		; \
 		ORA #%00000010		;  | consider sprite not to be an enemy
-		STA $167A,x		; /
+		STA !167A,x		; /
 ENDSHELLLOOP:	RTS
 
-NOSTARANI:	LDA $1656,y		; \  force shell
+NOSTARANI:	LDA !1656,y		; \  force shell
 		ORA #%10000000		;  | to disappear
-		STA $1656,y		; /  in smoke
+		STA !1656,y		; /  in smoke
 		LDA #$02		; \ set shell into
-		STA $14C8,y		; / death mode (status=2)
+		STA !14C8,y		; / death mode (status=2)
 		BRA STARTKNOCKOUT
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1017,21 +1019,21 @@ INTERACTION:	LDA $77			; \
 		BNE YOSHI_CHECK		; /
 		LDA $7D			; \ if moving downward
 		BPL MARIO_INTERACT	; / skip Yoshi check
-YOSHI_CHECK:	LDA $187A		; \ yoshi interact
+YOSHI_CHECK:	LDA $187A|!addr		; \ yoshi interact
 		BNE YOSHI_INTERACT	; / if riding Yoshi
 MARIO_INTERACT:	JSL !MARIOSPRINTERACT	; normal interact with mario
 		RTS
-YOSHI_INTERACT:	LDA $1490		; \ Mario INTERACTION
+YOSHI_INTERACT:	LDA $1490|!addr		; \ Mario INTERACTION
 		BNE MARIO_INTERACT	; / if Mario has star
-		LDA $154C,x		; \ don't interact if disable
+		LDA !154C,x		; \ don't interact if disable
 		BNE END_INTERACT	; / INTERACTION timer is set
-		LDA $167A,x		; \
+		LDA !167A,x		; \
 		PHA			;  | set "no default INTERACTION"
 		ORA #%10000000		;  | flag temporarily and back-up
-		STA $167A,x		; /
+		STA !167A,x		; /
 		JSL !MARIOSPRINTERACT	; detect if mario touching
 		PLA			; \ load backed up
-		STA $167A,x		; / interact flag
+		STA !167A,x		; / interact flag
 		BCC END_INTERACT	; if mario is not touching, don't lose yoshi
 		JSR LOSEYOSHI		; else lose yoshi
 END_INTERACT:	RTS
@@ -1039,55 +1041,55 @@ END_INTERACT:	RTS
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 LOSEYOSHI:	PHX
-		LDX $18E2
+		LDX $18E2|!addr
 		LDA #$10
-		STA $163D,x
+		STA $163D|!addr,x
 		LDA #$03
-		STA $1DFA
+		STA $1DFA|!addr
 		LDA #$13
-		STA $1DFC
+		STA $1DFC|!addr
 		LDA #$02
 		STA $C1,x
-		STZ $187A
-		STZ $0DC1
+		STZ $187A|!addr
+		STZ $0DC1|!addr
 		LDA #$C0
 		STA $7D
 		STZ $7B
-		LDY $157B,x
+		LDY $157B|!addr,x
 		PHX
 		TYX
-		LDA $02A4B3,x
+		LDA $02A4B3|!bank,x
 		PLX
 		STA $B5,x
-		STZ $1593,x
-		STZ $151B,x
-		STZ $18AE
+		STZ $1593|!addr,x
+		STZ $151B|!addr,x
+		STZ $18AE|!addr
 		LDA #$30
-		STA $1497
+		STA $1497|!addr
 		PLX
 		RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 STOPFIREBALLS:	LDY #$09		; index of first fireball
-FB_LOOP_BEGIN:	LDA $170B,y		; \
+FB_LOOP_BEGIN:	LDA $170B|!addr,y		; \
 		CMP #$05		;  | ignore if not fireball
 		BNE FB_LOOP		; /
 		JSL !GETSPRITECLIPPINGA	; \
-		LDA $171F,y		;  | ignore
+		LDA $171F|!addr,y		;  | ignore
 		SEC			;  | if not
 		SBC #$02		;  | touching
 		STA $00			;  | sprite
-		LDA $1733,y		;  |
+		LDA $1733|!addr,y		;  |
 		SBC #$00		;  |
 		STA $08			;  |
 		LDA #$0C		;  |
 		STA $02			;  |
-		LDA $1715,y		;  |
+		LDA $1715|!addr,y		;  |
 		SEC			;  |
 		SBC #$04		;  |
 		STA $01			;  |
-		LDA $1729,y		;  |
+		LDA $1729|!addr,y		;  |
 		SBC #$00		;  |
 		STA $09			;  |
 		LDA #$13		;  |
@@ -1095,11 +1097,11 @@ FB_LOOP_BEGIN:	LDA $170B,y		; \
 		JSL !CHECKFORCONTACT	;  |
 		BCC FB_LOOP		; /
 		LDA #$0F		; \
-		STA $176F,y		;  | turn fireball
+		STA $176F|!addr,y		;  | turn fireball
 		LDA #$01		;  | into smoke
-		STA $170B,y		; /
+		STA $170B|!addr,y		; /
 		LDA #$01		; \ play
-		STA $1DF9		; / SFX
+		STA $1DF9|!addr		; / SFX
 FB_LOOP:		DEY			; \
 		CMP #$08		;  | loop if not reached end
 		BCS FB_LOOP_BEGIN	; /
@@ -1166,7 +1168,7 @@ HEADNOFLIPX:	PLX			;  |
 		ADC !GFXTMP_XPOSITION	;  |
 		CLC			;  |
 		ADC $00			;  |
-		STA $0300,y		; /
+		STA $0300|!addr,y		; /
 		LDA HEAD_YPOS,x		; \
 		CLC			;  | Y
 		ADC !GFXTMP_YPOSITION	;  |
@@ -1178,14 +1180,14 @@ HEADNOFLIPX:	PLX			;  |
 HEADNOFLIPY:	PLX			;  |
 		CLC			;  |
 		ADC $01			;  |
-		STA $0301,y		; /
+		STA $0301|!addr,y		; /
 		LDA HEAD_TILES,x	; \
 		CLC			;  | set tile
 		ADC !GFXTMP_DSLOTTILE	;  | number
-		STA $0302,y		; /
+		STA $0302|!addr,y		; /
 		PHX			; \
-		LDX $15E9		;  | sprite
-		LDA $15F6,x		;  | props
+		LDX $15E9|!addr		;  | sprite
+		LDA !15F6,x		;  | props
 		AND #%11110001		;  |
 		ORA !HEADPALETTE,x	;  |
 		LDX !GFXTMP_HORIZFLIP	;  |
@@ -1198,7 +1200,7 @@ HEADNOFLIPXT:	;PLX			;  |
 		ORA #%10000000		;  |
 HEADNOFLIPYT:	PLX			;  |
 		ORA $64			;  |
-		STA $0303,y		; /
+		STA $0303|!addr,y		; /
 		INY			; \
 		INY			;  | next OAM
 		INY			;  | index
@@ -1210,12 +1212,12 @@ ENDHEADLOOP:	PLX			; load backed up X
 RETURNHEAD:	RTS
 
 DRAW_BASE:	LDA $00			; \ X
-		STA $0300,y		; /
+		STA $0300|!addr,y		; /
 		LDA $01			; \ Y
-		STA $0301,y		; /
+		STA $0301|!addr,y		; /
 		LDA #!STEMTILE		; \ set tile
-		STA $0302,y		; / number
-		LDA $15F6,x		; \
+		STA $0302|!addr,y		; / number
+		LDA !15F6,x		; \
 		PHX			;  | set
 		LDX !GFXTMP_HORIZFLIP	;  | sprite
 		BNE BASENOFLIPXT	;  | props
@@ -1227,7 +1229,7 @@ BASENOFLIPXT:	;PLX			;  |
 		ORA #%10000000		;  |
 BASENOFLIPYT:	PLX			;  |
 		ORA $64			;  |
-		STA $0303,y		; /
+		STA $0303|!addr,y		; /
 		INY			; \
 		INY			;  | next OAM
 		INY			;  | index
@@ -1265,7 +1267,7 @@ GETSLOT:
 	STA !TEMP	;back to scratch
 	LDA.w #!GFXADDR&$FFFF
 	CLC
-	ADC !TEMP	;add frame offset	
+	ADC !TEMP	;add frame offset
 	STA !SLOTPTR	;store to pointer to be used at transfer time
 	SEP #$20	;8bit store
 	LDA #!GFXADDR/$10000
@@ -1286,18 +1288,18 @@ GETSLOT:
 	ASL A
 	ASL A
 	CLC
-	ADC #$0B44	;add 0B44, base address of buffer	
+	ADC #$0B44	;add 0B44, base address of buffer
 	STA !SLOTDEST	;destination address in the buffer
 
 	JSR DMABUFFER	;ROM -> RAM copy
 
-	SEP #$20	;8bit A	
+	SEP #$20	;8bit A
 	INC !SLOTSUSED	;one extra slot has been used
 
 	PLA		;return starting tile number
 	PLY
 	RTS
-		
+
 NONEFREE:
 	PLA
 	PLY
@@ -1400,7 +1402,7 @@ DMABUFFER:
 ;
 ;       Y = index to sprite OAM ($300)
 ;       $00 = sprite x position relative to screen boarder
-;       $01 = sprite y position relative to screen boarder  
+;       $01 = sprite y position relative to screen boarder
 ;
 ; It is adapted from the subroutine at $03B760
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1408,18 +1410,18 @@ DMABUFFER:
 SPR_T1:              db $0C,$1C
 SPR_T2:              db $01,$02
 
-GET_DRAW_INFO:       STZ $186C,x             ; reset sprite offscreen flag, vertical
-                    STZ $15A0,x             ; reset sprite offscreen flag, horizontal
-                    LDA $E4,x               ; \
+GET_DRAW_INFO:       STZ !186C,x             ; reset sprite offscreen flag, vertical
+                    STZ !15A0,x             ; reset sprite offscreen flag, horizontal
+                    LDA !E4,x               ; \
                     CMP $1A                 ;  | set horizontal offscreen if necessary
-                    LDA $14E0,x             ;  |
+                    LDA !14E0,x             ;  |
                     SBC $1B                 ;  |
                     BEQ ON_SCREEN_X         ;  |
-                    INC $15A0,x             ; /
+                    INC !15A0,x             ; /
 
-ON_SCREEN_X:         LDA $14E0,x             ; \
+ON_SCREEN_X:         LDA !14E0,x             ; \
                     XBA                     ;  |
-                    LDA $E4,x               ;  |
+                    LDA !E4,x               ;  |
                     REP #$20                ;  |
                     SEC                     ;  |
                     SBC $1A                 ;  | mark sprite INVALID if far enough off screen
@@ -1429,41 +1431,41 @@ ON_SCREEN_X:         LDA $14E0,x             ; \
                     SEP #$20                ;  |
                     ROL A                   ;  |
                     AND #$01                ;  |
-                    STA $15C4,x             ; / 
-                    BNE INVALID             ; 
-                    
+                    STA !15C4,x             ; /
+                    BNE INVALID             ;
+
                     LDY #$00                ; \ set up loop:
-                    LDA $1662,x             ;  | 
+                    LDA !1662,x             ;  |
                     AND #$20                ;  | if not smushed (1662 & 0x20), go through loop twice
                     BEQ ON_SCREEN_LOOP      ;  | else, go through loop once
-                    INY                     ; / 
-ON_SCREEN_LOOP:      LDA $D8,x               ; \ 
+                    INY                     ; /
+ON_SCREEN_LOOP:      LDA !D8,x               ; \
                     CLC                     ;  | set vertical offscreen if necessary
                     ADC SPR_T1,y            ;  |
                     PHP                     ;  |
                     CMP $1C                 ;  | (vert screen boundry)
                     ROL $00                 ;  |
                     PLP                     ;  |
-                    LDA $14D4,x             ;  | 
+                    LDA !14D4,x             ;  |
                     ADC #$00                ;  |
                     LSR $00                 ;  |
                     SBC $1D                 ;  |
                     BEQ ON_SCREEN_Y         ;  |
-                    LDA $186C,x             ;  | (vert offscreen)
+                    LDA !186C,x             ;  | (vert offscreen)
                     ORA SPR_T2,y            ;  |
-                    STA $186C,x             ;  |
+                    STA !186C,x             ;  |
 ON_SCREEN_Y:         DEY                     ;  |
                     BPL ON_SCREEN_LOOP      ; /
 
-                    LDY $15EA,x             ; get offset to sprite OAM
-                    LDA $E4,x               ; \ 
-                    SEC                     ;  | 
+                    LDY !15EA,x             ; get offset to sprite OAM
+                    LDA !E4,x               ; \
+                    SEC                     ;  |
                     SBC $1A                 ;  | $00 = sprite x position relative to screen boarder
-                    STA $00                 ; / 
-                    LDA $D8,x               ; \ 
-                    SEC                     ;  | 
+                    STA $00                 ; /
+                    LDA !D8,x               ; \
+                    SEC                     ;  |
                     SBC $1C                 ;  | $01 = sprite y position relative to screen boarder
-                    STA $01                 ; / 
+                    STA $01                 ; /
                     RTS                     ; return
 
 INVALID:             PLA                     ; \ return from *main gfx routine* subroutine...
@@ -1476,7 +1478,7 @@ INVALID:             PLA                     ; \ return from *main gfx routine* 
 ; This subroutine deals with sprites that have moved off screen
 ; It is adapted from the subroutine at $01AC0D
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-                    
+
 SPR_T12:             db $40,$B0
 SPR_T13:             db $01,$FF
 SPR_T14:             db $30,$C0,$A0,$C0,$A0,$F0,$60,$90		;bank 1 sizes
@@ -1486,7 +1488,7 @@ SPR_T15:             db $01,$FF,$01,$FF,$01,$FF,$01,$FF		;bank 1 sizes
 
 SUB_OFF_SCREEN_X1:   LDA #$02                ; \ entry point of routine determines value of $03
                     BRA STORE_03            ;  | (table entry to use on horizontal levels)
-SUB_OFF_SCREEN_X2:   LDA #$04                ;  | 
+SUB_OFF_SCREEN_X2:   LDA #$04                ;  |
                     BRA STORE_03            ;  |
 SUB_OFF_SCREEN_X3:   LDA #$06                ;  |
                     BRA STORE_03            ;  |
@@ -1497,7 +1499,7 @@ SUB_OFF_SCREEN_X5:   LDA #$0A                ;  |
 SUB_OFF_SCREEN_X6:   LDA #$0C                ;  |
                     BRA STORE_03            ;  |
 SUB_OFF_SCREEN_X7:   LDA #$0E                ;  |
-STORE_03:			STA $03					;  |            
+STORE_03:			STA $03					;  |
 					BRA START_SUB			;  |
 SUB_OFF_SCREEN_X0:   STZ $03					; /
 
@@ -1505,15 +1507,15 @@ START_SUB:           JSR SUB_IS_OFF_SCREEN   ; \ if sprite is not off screen, re
                     BEQ RETURN_35           ; /
                     LDA $5B                 ; \  goto VERTICAL_LEVEL if vertical level
                     AND #$01                ; |
-                    BNE VERTICAL_LEVEL      ; /     
-                    LDA $D8,x               ; \
-                    CLC                     ; | 
+                    BNE VERTICAL_LEVEL      ; /
+                    LDA !D8,x               ; \
+                    CLC                     ; |
                     ADC #$50                ; | if the sprite has gone off the bottom of the level...
-                    LDA $14D4,x             ; | (if adding 0x50 to the sprite y position would make the high byte >= 2)
-                    ADC #$00                ; | 
-                    CMP #$02                ; | 
+                    LDA !14D4,x             ; | (if adding 0x50 to the sprite y position would make the high byte >= 2)
+                    ADC #$00                ; |
+                    CMP #$02                ; |
                     BPL ERASE_SPRITE        ; /    ...erase the sprite
-                    LDA $167A,x             ; \ if "process offscreen" flag is set, return
+                    LDA !167A,x             ; \ if "process offscreen" flag is set, return
                     AND #$04                ; |
                     BNE RETURN_35           ; /
                     LDA $13                 ;A:8A00 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdiZcHC:0756 VC:176 00 FL:205
@@ -1525,13 +1527,13 @@ START_SUB:           JSR SUB_IS_OFF_SCREEN   ; \ if sprite is not off screen, re
                     CLC                     ;A:8A00 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdiZcHC:0882 VC:176 00 FL:205
                     ADC SPR_T14,y           ;A:8A00 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdiZcHC:0896 VC:176 00 FL:205
                     ROL $00                 ;A:8AC0 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:eNvMXdizcHC:0928 VC:176 00 FL:205
-                    CMP $E4,x               ;A:8AC0 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:eNvMXdizCHC:0966 VC:176 00 FL:205
+                    CMP !E4,x               ;A:8AC0 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:eNvMXdizCHC:0966 VC:176 00 FL:205
                     PHP                     ;A:8AC0 X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:0996 VC:176 00 FL:205
                     LDA $1B                 ;A:8AC0 X:0009 Y:0001 D:0000 DB:01 S:01F0 P:envMXdizCHC:1018 VC:176 00 FL:205
                     LSR $00                 ;A:8A00 X:0009 Y:0001 D:0000 DB:01 S:01F0 P:envMXdiZCHC:1042 VC:176 00 FL:205
                     ADC SPR_T15,y           ;A:8A00 X:0009 Y:0001 D:0000 DB:01 S:01F0 P:envMXdizcHC:1080 VC:176 00 FL:205
                     PLP                     ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F0 P:eNvMXdizcHC:1112 VC:176 00 FL:205
-                    SBC $14E0,x             ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:1140 VC:176 00 FL:205
+                    SBC !14E0,x             ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:1140 VC:176 00 FL:205
                     STA $00                 ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F1 P:eNvMXdizCHC:1172 VC:176 00 FL:205
                     LSR $01                 ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F1 P:eNvMXdizCHC:1196 VC:176 00 FL:205
                     BCC SPR_L31             ;A:8AFF X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdiZCHC:1234 VC:176 00 FL:205
@@ -1539,26 +1541,26 @@ START_SUB:           JSR SUB_IS_OFF_SCREEN   ; \ if sprite is not off screen, re
                     STA $00                 ;A:8A7F X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:1266 VC:176 00 FL:205
 SPR_L31:             LDA $00                 ;A:8A7F X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:1290 VC:176 00 FL:205
                     BPL RETURN_35           ;A:8A7F X:0009 Y:0001 D:0000 DB:01 S:01F1 P:envMXdizCHC:1314 VC:176 00 FL:205
-ERASE_SPRITE:        LDA $14C8,x             ; \ if sprite status < 8, permanently erase sprite
+ERASE_SPRITE:        LDA !14C8,x             ; \ if sprite status < 8, permanently erase sprite
                     CMP #$08                ; |
-                    BCC KILL_SPRITE         ; /    
-                    LDY $161A,x             ;A:FF08 X:0007 Y:0001 D:0000 DB:01 S:01F3 P:envMXdiZCHC:1108 VC:059 00 FL:2878
+                    BCC KILL_SPRITE         ; /
+                    LDY !161A,x             ;A:FF08 X:0007 Y:0001 D:0000 DB:01 S:01F3 P:envMXdiZCHC:1108 VC:059 00 FL:2878
                     CPY #$FF                ;A:FF08 X:0007 Y:0000 D:0000 DB:01 S:01F3 P:envMXdiZCHC:1140 VC:059 00 FL:2878
                     BEQ KILL_SPRITE         ;A:FF08 X:0007 Y:0000 D:0000 DB:01 S:01F3 P:envMXdizcHC:1156 VC:059 00 FL:2878
                     LDA #$00                ;A:FF08 X:0007 Y:0000 D:0000 DB:01 S:01F3 P:envMXdizcHC:1172 VC:059 00 FL:2878
-                    STA $1938,y             ;A:FF00 X:0007 Y:0000 D:0000 DB:01 S:01F3 P:envMXdiZcHC:1188 VC:059 00 FL:2878
-KILL_SPRITE:         STZ $14C8,x             ; erase sprite
+                    STA !1938,y             ;A:FF00 X:0007 Y:0000 D:0000 DB:01 S:01F3 P:envMXdiZcHC:1188 VC:059 00 FL:2878
+KILL_SPRITE:         STZ !14C8,x             ; erase sprite
 RETURN_35:           RTS                     ; return
 
-VERTICAL_LEVEL:      LDA $167A,x             ; \ if "process offscreen" flag is set, return
+VERTICAL_LEVEL:      LDA !167A,x             ; \ if "process offscreen" flag is set, return
                     AND #$04                ; |
                     BNE RETURN_35           ; /
                     LDA $13                 ; \
-                    LSR A                   ; | 
+                    LSR A                   ; |
                     BCS RETURN_35           ; /
-                    LDA $E4,x               ; \ 
+                    LDA !E4,x               ; \
                     CMP #$00                ;  | if the sprite has gone off the side of the level...
-                    LDA $14E0,x             ;  |
+                    LDA !14E0,x             ;  |
                     SBC #$00                ;  |
                     CMP #$02                ;  |
                     BCS ERASE_SPRITE        ; /  ...erase the sprite
@@ -1571,13 +1573,13 @@ VERTICAL_LEVEL:      LDA $167A,x             ; \ if "process offscreen" flag is 
                     CLC                     ;A:00BD X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNvMXdizcHC:0076 VC:251 00 FL:5379
                     ADC SPR_T12,y           ;A:00BD X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNvMXdizcHC:0090 VC:251 00 FL:5379
                     ROL $00                 ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F3 P:enVMXdizCHC:0122 VC:251 00 FL:5379
-                    CMP $D8,x               ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNVMXdizcHC:0160 VC:251 00 FL:5379
+                    CMP !D8,x               ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNVMXdizcHC:0160 VC:251 00 FL:5379
                     PHP                     ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNVMXdizcHC:0190 VC:251 00 FL:5379
-                    LDA.w $001D             ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F2 P:eNVMXdizcHC:0212 VC:251 00 FL:5379
+                    LDA.w $001D|!dp             ;A:006D X:0009 Y:0001 D:0000 DB:01 S:01F2 P:eNVMXdizcHC:0212 VC:251 00 FL:5379
                     LSR $00                 ;A:0000 X:0009 Y:0001 D:0000 DB:01 S:01F2 P:enVMXdiZcHC:0244 VC:251 00 FL:5379
                     ADC SPR_T13,y           ;A:0000 X:0009 Y:0001 D:0000 DB:01 S:01F2 P:enVMXdizCHC:0282 VC:251 00 FL:5379
                     PLP                     ;A:0000 X:0009 Y:0001 D:0000 DB:01 S:01F2 P:envMXdiZCHC:0314 VC:251 00 FL:5379
-                    SBC $14D4,x             ;A:0000 X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNVMXdizcHC:0342 VC:251 00 FL:5379
+                    SBC !14D4,x             ;A:0000 X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNVMXdizcHC:0342 VC:251 00 FL:5379
                     STA $00                 ;A:00FF X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNvMXdizcHC:0374 VC:251 00 FL:5379
                     LDY $01                 ;A:00FF X:0009 Y:0001 D:0000 DB:01 S:01F3 P:eNvMXdizcHC:0398 VC:251 00 FL:5379
                     BEQ SPR_L38             ;A:00FF X:0009 Y:0001 D:0000 DB:01 S:01F3 P:envMXdizcHC:0422 VC:251 00 FL:5379
@@ -1587,8 +1589,8 @@ SPR_L38:             LDA $00                 ;A:007F X:0009 Y:0001 D:0000 DB:01 
                     BPL RETURN_35           ;A:007F X:0009 Y:0001 D:0000 DB:01 S:01F3 P:envMXdizcHC:0502 VC:251 00 FL:5379
                     BMI ERASE_SPRITE        ;A:8AFF X:0002 Y:0000 D:0000 DB:01 S:01F3 P:eNvMXdizcHC:0704 VC:184 00 FL:5490
 
-SUB_IS_OFF_SCREEN:   LDA $15A0,x             ; \ if sprite is on screen, accumulator = 0 
-                    ORA $186C,x             ; |  
+SUB_IS_OFF_SCREEN:   LDA !15A0,x             ; \ if sprite is on screen, accumulator = 0
+                    ORA !186C,x             ; |
                     RTS                     ; / return
 
 
@@ -1602,10 +1604,10 @@ SUB_IS_OFF_SCREEN:   LDA $15A0,x             ; \ if sprite is on screen, accumul
 SUB_HORZ_POS:		LDY #$00				;A:25D0 X:0006 Y:0001 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1020 VC:097 00 FL:31642
 					LDA $94					;A:25D0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZCHC:1036 VC:097 00 FL:31642
 					SEC                     ;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1060 VC:097 00 FL:31642
-					SBC $E4,x				;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1074 VC:097 00 FL:31642
+					SBC !E4,x				;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1074 VC:097 00 FL:31642
 					;STA $0F					;A:25F4 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1104 VC:097 00 FL:31642
 					LDA $95					;A:25F4 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1128 VC:097 00 FL:31642
-					SBC $14E0,x				;A:2500 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZcHC:1152 VC:097 00 FL:31642
+					SBC !14E0,x				;A:2500 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZcHC:1152 VC:097 00 FL:31642
 					BPL SPR_L16             ;A:25FF X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1184 VC:097 00 FL:31642
 					INY                     ;A:25FF X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1200 VC:097 00 FL:31642
 SPR_L16:				RTS                     ;A:25FF X:0006 Y:0001 D:0000 DB:03 S:01ED P:envMXdizcHC:1214 VC:097 00 FL:31642
@@ -1618,10 +1620,10 @@ SPR_L16:				RTS                     ;A:25FF X:0006 Y:0001 D:0000 DB:03 S:01ED P:
 SUB_VERT_POS:		LDY #$00				;A:25D0 X:0006 Y:0001 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1020 VC:097 00 FL:31642
 					LDA $96					;A:25D0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZCHC:1036 VC:097 00 FL:31642
 					SEC                     ;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1060 VC:097 00 FL:31642
-					SBC $D8,x				;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1074 VC:097 00 FL:31642
+					SBC !D8,x				;A:25F0 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizCHC:1074 VC:097 00 FL:31642
 					;STA $0F					;A:25F4 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1104 VC:097 00 FL:31642
 					LDA $97					;A:25F4 X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1128 VC:097 00 FL:31642
-					SBC $14D4,x				;A:2500 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZcHC:1152 VC:097 00 FL:31642
+					SBC !14D4,x				;A:2500 X:0006 Y:0000 D:0000 DB:03 S:01ED P:envMXdiZcHC:1152 VC:097 00 FL:31642
 					BPL SPR_L17             ;A:25FF X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1184 VC:097 00 FL:31642
 					INY                     ;A:25FF X:0006 Y:0000 D:0000 DB:03 S:01ED P:eNvMXdizcHC:1200 VC:097 00 FL:31642
 SPR_L17:				RTS                     ;A:25FF X:0006 Y:0001 D:0000 DB:03 S:01ED P:envMXdizcHC:1214 VC:097 00 FL:31642
