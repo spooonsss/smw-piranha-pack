@@ -530,7 +530,7 @@ HEADINTERACTEND:	RTS
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-SHELLINTERACT:	LDY #$0C		; load number of times to go through loop
+SHELLINTERACT:	LDY #!SprSize		; load number of times to go through loop
 KO_LOOP:		CPY #$00		; \ zero? if so,
 		BEQ HEADINTERACTEND	; / end loop
 		DEY			; decrease # of times left+get index
