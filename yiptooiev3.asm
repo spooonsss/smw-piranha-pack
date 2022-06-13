@@ -13,7 +13,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Variables:
-		!SPRITE_NUM = $82		; custom sprite of needlenose bomb
+		!SPRITE_NUM = $82		; custom sprite of needlenose bomb  https://www.smwcentral.net/?p=section&a=details&id=18520
 		!SHOOTSND = $3A			; sound after needlenose fired  (in $1DFC)
 		!KNOCKOUTSND = $37		; sound when you hit it with a shell (in $1DFC)
 		!FLASHPALETTE = $0F		; palette for flashing head
