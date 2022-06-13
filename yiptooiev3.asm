@@ -440,28 +440,27 @@ TRACKING:	LDA $14			; \
 		STA $97			; / Y high byte
 		PLA			; \ load backed up
 		STA $96			; / Y low byte
-NOROTATE:	LDA !TIMER,x		; \
-		ASL A			;  | set
+NOROTATE:
 if !sa1 == 1
-		PHA ; FIXME reorder this or does INC $2250 work
 		LDA #$01
 		STA $2250
-		PLA
-		STA $2251 ;  | head
+		LDA !TIMER,x	; \
+		ASL A			;  | set
+		STA $2251 		;  | head
 		STZ $2252		;  | frame
 		LDA #$09		;  |
 		STA $2253
 		STZ $2254
-		NOP
-		NOP
-		NOP      		;  |
+		NOP : BRA $00 ; wait 5 cycles
 		LDA $2306		;  |
 else
+		LDA !TIMER,x	; \
+		ASL A			;  | set
 		STA $4204		;  | head
 		STZ $4205		;  | frame
 		LDA #$09		;  |
 		STA $4206		;  |
-		NOP #8
+		PHB : PLB : PHB : PLB : NOP ; wait 16 cycles
 		LDA $4214		;  |
 endif
 		ASL A			;  |
@@ -832,11 +831,11 @@ SHOOT:		LDA !EXTRA_BIT		; \ back up extra
 		STA !7FAB10,x		; / custom sprite
 		PLX			; load backed up X
 		LDA !E4,x		; \
-		STA !E4|!dp,y		;  | set center
+		STA !E4,y		;  | set center
 		LDA !14E0,x		;  | position for
 		STA !14E0,y		;  | needlenose
 		LDA !D8,x		;  | so that in next
-		STA !D8|!dp,y		;  | code, it can
+		STA !D8,y		;  | code, it can
 		LDA !14D4,x		;  | be shifted
 		STA !14D4,y		; /
 		LDA !OFFSET,x		; \
@@ -848,8 +847,8 @@ SHOOT:		LDA !EXTRA_BIT		; \ back up extra
 		BPL ADDPROJXDISP	;  |
 		DEX			;  |
 ADDPROJXDISP:	CLC			;  |
-		ADC !E4|!dp,y		;  |
-		STA !E4|!dp,y		;  |
+		ADC !E4,y		;  |
+		STA !E4,y		;  |
 		TXA			;  |
 		ADC !14E0,y		;  |
 		STA !14E0,y		;  |
@@ -867,8 +866,8 @@ NOFLIPPROJY:	LDX #$00		;  |
 		BPL ADDPROJYDISP	;  |
 		DEX			;  |
 ADDPROJYDISP:	CLC			;  |
-		ADC !D8|!dp,y		;  |
-		STA !D8|!dp,y		;  |
+		ADC !D8,y		;  |
+		STA !D8,y		;  |
 		TXA			;  |
 		ADC !14D4,y		;  |
 		STA !14D4,y		;  |
@@ -877,13 +876,13 @@ ADDPROJYDISP:	CLC			;  |
 		PHX			;  | speeds
 		TAX			;  |
 		LDA XSPEEDS,x		;  |
-		STA !B6|!dp,y		;  |
+		STA !B6,y		;  |
 		LDA YSPEEDS,x		;  |
 		LDX !EXTRA_BIT		;  |
 		BEQ NOFLIPPROJYS	;  |
 		EOR #$FF		;  |
 		INC A			;  |
-NOFLIPPROJYS:	STA !AA|!dp,y		;  |
+NOFLIPPROJYS:	STA !AA,y		;  |
 		PLX			; /
 		RTS
 
@@ -976,7 +975,7 @@ GETHIT:		LDA #$04		; \ give mario
 		JSL $02ACE5|!bank		; / 1000 points
 		LDA #!KNOCKOUTSND	; \ play knockout
 		STA $1DFC|!addr		; / sound
-		LDA !9E|!dp,y		; \
+		LDA !9E,y		; \
 		CMP #$53		;  | if throw block, don't do star animation
 		BEQ NOSTARANI		; /
 		LDA #$04                ; \ set sprite to
@@ -988,10 +987,10 @@ GETHIT:		LDA #$04		; \ give mario
 		JSL $07FC3B|!bank		;  | animation
 		STX $15E9|!addr		;  |
 		PLY			; /
-STARTKNOCKOUT:	LDA !B6|!dp,y		; \
+STARTKNOCKOUT:	LDA !B6,y		; \
 		BNE GETHIBIT		;  | get index
 		LDA !E4,x		;  | for direction
-		CMP !E4|!dp,y		;  | to turn
+		CMP !E4,y		;  | to turn
 		LDA !14E0,x		;  | towards
 		SBC !14E0,y		;  |
 GETHIBIT:	ROL A			;  |
@@ -1290,7 +1289,6 @@ get_dynamic_slot:
 	ADC !Temp	;add frame offset	
 	STA !SlotPointer	;store to pointer to be used at transfer time
 	SEP #$20	;8bit store
-	PHB : PLA
     ; PHB : PLA
 	LDA.b #gfx/$10000
 	CLC

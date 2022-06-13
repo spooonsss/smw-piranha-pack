@@ -560,7 +560,7 @@ GETHIT:		LDA !GFXMODE,x		; \ kill like a normal sprite if
 		JSL $02ACE5|!bank		; / 1000 points
 		LDA #!KNOCKOUTSND	; \ play knockout
 		STA $1DFC|!addr		; / sound
-		LDA !9E|!dp,y		; \
+		LDA !9E,y		; \
 		CMP #$53		;  | if throw block, don't do star animation
 		BEQ NOSTARANI		; /
 		LDA #$04                ; \ set sprite to
@@ -572,10 +572,10 @@ GETHIT:		LDA !GFXMODE,x		; \ kill like a normal sprite if
 		JSL $07FC3B|!bank		;  | animation
 		STX $15E9|!addr		;  |
 		PLY			; /
-STARTKNOCKOUT:	LDA !B6|!dp,y		; \
+STARTKNOCKOUT:	LDA !B6,y		; \
 		BNE GETHIBIT		;  | get index
 		LDA !E4,x		;  | for direction
-		CMP !E4|!dp,y		;  | to turn
+		CMP !E4,y		;  | to turn
 		LDA !14E0,x		;  | towards
 		SBC !14E0,y		;  |
 GETHIBIT:	ROL A			;  |
@@ -872,7 +872,6 @@ get_dynamic_slot:
 	ADC !Temp	;add frame offset	
 	STA !SlotPointer	;store to pointer to be used at transfer time
 	SEP #$20	;8bit store
-	PHB : PLA
     ; PHB : PLA
 	LDA.b #gfx/$10000
 	CLC
