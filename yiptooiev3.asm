@@ -1,18 +1,15 @@
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Yoshi's Island Wild Ptooie Piranha Plant (v3.0)
-; Programmed by SMWEdit
+; Programmed by SMWEdit, conversion to asar and sa-1 compatibility by spooonsss
 ;
 ; Uses first extra bit: YES
 ; It will be upside-down if the first extra bit is set
 ; (Yoshi's Island did not have upside-down Ptooies, but I decided
 ; to leave this feature in since this is just a major blowhard edit)
 ;
-; You will need to patch SMKDan's dsx.asm to your ROM with xkas
+; You will need to patch SMKDan's dsx.asm to your ROM, unless your rom is sa-1
 ; this sprite, like all other dynamic sprites, uses the last 4 rows of sp4
 ;
-; This sprite requires manual GFX insertion. Please refer to the README for more info
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;; Variables:
