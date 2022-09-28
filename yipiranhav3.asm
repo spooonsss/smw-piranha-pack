@@ -648,7 +648,7 @@ LOSEYOSHI:	PHX
 		LDA #$C0
 		STA $7D
 		STZ $7B
-		LDY !157C-1|!addr,x
+		LDY !157C-1,x
 		PHX
 		TYX
 		LDA $02A4B3|!bank,x
