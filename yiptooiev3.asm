@@ -49,6 +49,10 @@
 		!CHECKFORCONTACT = $03B72B
 		!SPINJUMPSTARS = $07FC3B
 
+if !dp != $0000
+warnings enable w1005
+endif
+
 prot gfx
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -878,13 +882,13 @@ ADDPROJYDISP:	CLC			;  |
 		PHX			;  | speeds
 		TAX			;  |
 		LDA XSPEEDS,x		;  |
-		STA !B6,y		;  |
+		STA.w !B6|!dp,y		;  |
 		LDA YSPEEDS,x		;  |
 		LDX !EXTRA_BIT		;  |
 		BEQ NOFLIPPROJYS	;  |
 		EOR #$FF		;  |
 		INC A			;  |
-NOFLIPPROJYS:	STA !AA,y		;  |
+NOFLIPPROJYS:	STA.w !AA|!dp,y		;  |
 		PLX			; /
 		RTS
 
@@ -968,9 +972,9 @@ KO_LOOP:		CPY #$00		; \ zero? if so,
 		LDA !14C8,y		; \  speed doesn't matter
 		CMP #$0B		;  | if Mario is holding
 		BEQ GETHIT		; /  the shell (status=B)
-		LDA !AA,y		; \ continue if sprite
+		LDA.w !AA|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has Y speed
-		LDA !B6,y		; \ continue if sprite
+		LDA.w !B6|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has X speed
 		BRA KO_LOOP		; no speed / not holding -> don't kill
 GETHIT:		LDA #$04		; \ give mario
@@ -989,7 +993,7 @@ GETHIT:		LDA #$04		; \ give mario
 		JSL $07FC3B|!bank		;  | animation
 		STX $15E9|!addr		;  |
 		PLY			; /
-STARTKNOCKOUT:	LDA !B6,y		; \
+STARTKNOCKOUT:	LDA.w !B6|!dp,y		; \
 		BNE GETHIBIT		;  | get index
 		LDA !E4,x		;  | for direction
 		CMP !E4,y		;  | to turn

@@ -1,4 +1,5 @@
-patch dsx.asm from SMWCentral to your ROM with xkas if you have not already done that with other sprites.
+patch dsx.asm (Dynamic Sprites Patch) from SMWCentral to your ROM with asar if you have 
+not already done that with other sprites. Unless your rom is sa-1 -- sa-1 pack comes with dsx already.
 
 put these files in your sprites directory in sprite tool:
 yipiranhav3.asm

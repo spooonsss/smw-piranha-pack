@@ -189,7 +189,7 @@ SPRITE_ROUTINE:	LDA !EXTRA_BITS,x	; \
 		BNE RETURN1		; /  status != 8
 		LDA $9D			; \ return if
 		BNE RETURN1		; / sprites locked
-		LDA #$00
+		; LDA #$00
 		%SubOffScreen()
 
 		LDA !EXTRA_BIT		; get extra bit
@@ -286,7 +286,8 @@ RETURNHIT:	RTS
 
 ;;;;;;;;;;;;;;;;
 
-SHRINK:		LDY !TIMER,x		; timer -> Y
+SHRINK:	
+		LDY !TIMER,x		; timer -> Y
 		LDA SHRINKFRAMES,y	; get frame
 		STA !FRAME,x		; set frame
 		LDA #$01		; \ set frame
@@ -551,9 +552,9 @@ KO_LOOP:		CPY #$00		; \ zero? if so,
 		LDA !14C8,y		; \  speed doesn't matter
 		CMP #$0B		;  | if Mario is holding
 		BEQ GETHIT		; /  the shell (status=B)
-		LDA !AA,y		; \ continue if sprite
+		LDA.w !AA|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has Y speed
-		LDA !B6,y		; \ continue if sprite
+		LDA.w !B6|!dp,y		; \ continue if sprite
 		BNE GETHIT		; / has X speed
 		BRA KO_LOOP		; no speed / not holding -> don't kill
 GETHIT:		LDA !GFXMODE,x		; \ kill like a normal sprite if
@@ -574,7 +575,7 @@ GETHIT:		LDA !GFXMODE,x		; \ kill like a normal sprite if
 		JSL $07FC3B|!bank		;  | animation
 		STX $15E9|!addr		;  |
 		PLY			; /
-STARTKNOCKOUT:	LDA !B6,y		; \
+STARTKNOCKOUT:	LDA.w !B6|!dp,y		; \
 		BNE GETHIBIT		;  | get index
 		LDA !E4,x		;  | for direction
 		CMP !E4,y		;  | to turn
