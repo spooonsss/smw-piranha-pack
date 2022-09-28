@@ -1,16 +1,16 @@
 Under "INIT and MAIN JSL targets", you will find these lines:
 
 
-CONFIGSADDR	dcw SHOTSADDR&$FFFF,HITSADDR&$FFFF
+CONFIGSADDR:	dw SHOTSADDR,HITSADDR
 
-SHOTSADDR	dcw SHOTS1&$FFFF,SHOTS2&$FFFF
-HITSADDR	dcw HITS1&$FFFF,HITS2&$FFFF
+SHOTSADDR:	dw SHOTS1,SHOTS2
+HITSADDR:	dw HITS1,HITS2
 
-SHOTS1		dcb $02 : dcb $05,$05,$02	; #shots-1, shots
-HITS1		dcb $02 : dcb $0D,$0A,$0C	; #hits-1, palettes
+SHOTS1:		db $02 : db $05,$05,$02	; #shots-1, shots
+HITS1:		db $02 : db $0D,$0A,$0C	; #hits-1, palettes
 
-SHOTS2		dcb $00 : dcb $05		; #shots-1, shots
-HITS2		dcb $02 : dcb $0D,$0A,$0C	; #hits-1, palettes
+SHOTS2:		db $00 : db $05		; #shots-1, shots
+HITS2:		db $02 : db $0D,$0A,$0C	; #hits-1, palettes
 
 
 This includes two preset customizations...
@@ -23,30 +23,30 @@ Here's how to create your own configuration:
 1. Copy/paste one of the configurations, and change the numbers on the symbols.
 
     Ex:
-        SHOTS3		dcb $00 : dcb $05		; #shots-1, shots
-        HITS3		dcb $02 : dcb $0D,$0A,$0C	; #hits-1, palettes
+        SHOTS3:		db $00 : db $05		; #shots-1, shots
+        HITS3:		db $02 : db $0D,$0A,$0C	; #hits-1, palettes
 
 2. Modify the shots... The first number is the amount of shots -1.
    The remaining numbers are the angles for firing. Range: $00-$0F...
    $00 is completely vertical, and $0F is completely horizontal.
 
    Ex: If you want to have 4 shots, at angles $08, $06, $04, and then $02
-        SHOTS3		dcb $03 : dcb $08,$06,$04,$02	; #shots-1, shots
+        SHOTS3:		db $03 : db $08,$06,$04,$02	; #shots-1, shots
 
 3. Modify the HP, and palettes... The first number is amount of hits to kill -1.
    The remaining numbers are order of palettes for the head after each shot is fired.
 
    Ex: If you wanted it to take 5 hits to kill at palettes $0D, $0A, $0C, $0B, and then $09
-	HITS2		dcb $04 : dcb $0D,$0A,$0C,$0B,$09	; #hits-1, palettes
+	HITS2:		db $04 : db $0D,$0A,$0C,$0B,$09	; #hits-1, palettes
 
 4. Add your configuration to the list of configurations
 
    Ex:
-	SHOTSADDR	dcw SHOTS1&$FFFF,SHOTS2&$FFFF
-	HITSADDR	dcw HITS1&$FFFF,HITS2&$FFFF
+	SHOTSADDR:	dw SHOTS1,SHOTS2
+	HITSADDR:	dw HITS1,HITS2
    would become
-	SHOTSADDR	dcw SHOTS1&$FFFF,SHOTS2&$FFFF,SHOTS3&$FFFF
-	HITSADDR	dcw HITS1&$FFFF,HITS2&$FFFF,HITS3&$FFFF
+	SHOTSADDR:	dw SHOTS1,SHOTS2,SHOTS3
+	HITSADDR:	dw HITS1,HITS2,HITS3
 
 5. It's time to use your new configuration
    Make a copy of yiptooiev3.cfg but NOT the ASM file. You can rename the CFG file to whatever you like.
