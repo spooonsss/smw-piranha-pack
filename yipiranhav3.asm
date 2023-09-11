@@ -864,22 +864,55 @@ get_dynamic_slot:
 	LDA #$00	;zero on no free slots
 	RTS
 
+!fullsa1 ?= 0
+if !fullsa1
+	STZ !Temp
+	LDA.b #(gfx/$10000)
+	CMP #$C0
+	BCS +
+	INC !Temp ; when graphics are in >4MB area, !Temp = 1
+endif
 +	PLA		;pop frame
 	REP #$20	;16bit A
 	AND.w #$00FF	;wipe high
 	XBA		;<< 8
 	LSR A		;>> 1 = << 7
-	STA !Temp	;back to scratch
-	LDA.w #gfx	;Get 16bit address
-	CLC
-	ADC !Temp	;add frame offset	
+	; CLC
+	ADC.w #gfx	;Get 16bit address
 	STA !SlotPointer	;store to pointer to be used at transfer time
-	SEP #$20	;8bit store
-    ; PHB : PLA
-	LDA.b #gfx/$10000
-	CLC
+
+if !fullsa1
+	LDA !Temp
+	BNE .hirom
+endif
+	SEP #$21	;8bit store
+	; CLC
+	LDA.b #(gfx/$10000)-1
 	ADC !GFXTMP_FRAMEBANK
 	STA !SlotBank	;store bank to 24bit pointer
+if !fullsa1
+	BRA +
+
+.hirom
+; SA-1 hirom-style banks
+	SEP #$20
+	LDA.b #gfx/$10000
+	ADC #$00
+	STA !SlotBank	;store bank to 24bit pointer
+
+	LDY !GFXTMP_FRAMEBANK
+	BEQ +
+	REP #$21
+	LDA !SlotPointer
+	; CLC
+	ADC #$8000
+	STA !SlotPointer
+	SEP #$20
+	LDA !SlotBank
+	ADC #$00
+	STA !SlotBank
++
+endif
 
 	PHX		;This is how I made your boi a routine
 	LDX !SlotsUsed		;calculate VRAM address + tile number
