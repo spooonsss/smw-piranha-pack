@@ -53,15 +53,17 @@ if !dp != $0000
 warnings enable w1005
 endif
 
+!yi_combined ?= 0
+
+if !yi_combined == 0
 prot gfx
+endif
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; INIT and MAIN JSL targets
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 		!FLASHPROP = !FLASHPALETTE*2&%00001110
-
-CONFIGSADDR:	dw SHOTSADDR,HITSADDR
 
 SHOTSADDR:	dw SHOTS1,SHOTS2
 HITSADDR:	dw HITS1,HITS2
@@ -76,6 +78,7 @@ FLIP_YPOS_LO:	db $00,$FE
 FLIP_YPOS_HI:	db $00,$FF
 
 		PRINT "INIT ",pc
+init:
 		PHB
 		PHK
 		PLB
@@ -129,6 +132,7 @@ SETINITOFFSET:	STA !OFFSET,x		; set initial rotation
 		RTL
 
 		PRINT "MAIN ",pc
+main:
 		PHB
 		PHK
 		PLB
@@ -1492,4 +1496,6 @@ SlotsTable:			;avaliable slots.  Any more transfers and it's overflowing by a da
 	db $CC,$C8,$C4,$C0		
 
 
+if !yi_combined == 0
 incbin piranhagfx.bin -> gfx
+endif

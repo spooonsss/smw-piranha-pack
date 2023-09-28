@@ -44,7 +44,11 @@
 		!CHECKFORCONTACT = $03B72B
 		!SPINJUMPSTARS = $07FC3B
 
+!yi_combined ?= 0
+
+if !yi_combined == 0
 prot gfx
+endif
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; INIT and MAIN JSL targets
@@ -57,6 +61,7 @@ FLIP_YPOS_LO:	db $00,$FE
 FLIP_YPOS_HI:	db $00,$FF
 
 		PRINT "INIT ",pc
+init:
 		PHB
 		PHK
 		PLB
@@ -82,6 +87,7 @@ FLIP_YPOS_HI:	db $00,$FF
 		RTL
 
 		PRINT "MAIN ",pc
+main:
 		PHB
 		PHK
 		PLB
@@ -1066,5 +1072,6 @@ endif
 SlotsTable:			;avaliable slots.  Any more transfers and it's overflowing by a dangerous amount.
 	db $CC,$C8,$C4,$C0		
 
-
+if !yi_combined == 0
 incbin piranhagfx.bin -> gfx
+endif
